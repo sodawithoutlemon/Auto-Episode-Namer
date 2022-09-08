@@ -1,4 +1,4 @@
-import tkinter
+giimport tkinter
 import os
 import tkinter.ttk as ttk
 from tkinter.filedialog import askdirectory
