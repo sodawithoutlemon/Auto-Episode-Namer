@@ -1,97 +1,117 @@
-giimport tkinter
+import tkinter
 import os
 import tkinter.ttk as ttk
 from tkinter.filedialog import askdirectory
-FONT_NAME = "Courier"
 
 bg = "white"
-bgforbutton = "#4285F4"
 text = "black"
 
 exceptions = ["1080", "720"]
-
+filename = None
 encode = ""
-extractedpos = []
 extractedloc = []
 extractedfiles = []
-filename = askdirectory()
-nepisodes = []
+episodes = []
+
 testrunoutput = []
 
+
 def convertbrain():
+    global filename
     global encode
+
+    episode = ""
+    kontroller = False
+
+    filename = askdirectory()
+
     for root, dirs, files in os.walk(filename, topdown=False):
         for name in files:
+
+            # app open every file in directory and only catch the names
             var = os.path.join(root, name)
             extractedloc.append(var)
             svar = var.split(filename)[1]
             extractedfiles.append(svar)
-    word = ""
-    episodes = []
-    kontroller = False
-    for item in extractedfiles:
-        encode = item[-3:]
-        stepone = [*item]
-        stepone.pop()
-        for x in range(len(stepone)):
 
-            char = stepone[x]
+            # app gets video format name
+            encode = svar[-3:]
+            stepone = [*svar]
+            stepone.pop()
 
-            if (char.isnumeric()):
-                if kontroller == False:
-                    word += "."
-                    kontroller = True
-                word += char
-            else:
-                if (kontroller):
-                    word += "."
-                    kontroller = False
-                word += " "
-        word = word.replace(" ", "")
-        word = word.replace(".", " ")
-        word = word[1:]
-        episodes.append(word)
-        word = ""
-    for item in episodes:
-        ntvar = item.split(" ")
-        ntvar = list(filter(None, ntvar))
+            # app detect every numeric numbers to name episodes
+            for x in range(len(stepone)):
+                char = stepone[x]
+                if (char.isnumeric()):
+                    if kontroller == False:
+                        episode += "."
+                        kontroller = True
+                    episode += char
+                else:
+                    if (kontroller):
+                        episode += "."
+                        kontroller = False
+                    episode += " "
 
-        for item in exceptions:
-            try:
-                ntvar.remove(item)
-            except:
-                pass
+            # reformatting so we can only see numbers
+            episode = episode.replace(" ", "")
+            episode = episode.replace(".", " ")
+            episode = episode[1:]
+            episode = episode.split(" ")
+            episode = list(filter(None, episode))
 
-        nepisodes.append(ntvar)
+            # removing hardcoded numbers like 1080p or 720p
+            for item in exceptions:
+                try:
+                    episode.remove(item)
+                except:
+                    pass
 
-def accepttestrun():
-    for y in range(len(testrunoutput)):
-        os.rename(testrunoutput[y], f"{filename}/{nepisodes[y][0]}.{encode}")
+            # saving episode numbers so we can use it on different functions
+            episodes.append(episode)
+            episode = ""
+
+
+# app's main converting style without checking
+def mainconvert():
+    convertbrain()
+    for y in range(len(episodes)):
+        os.rename(extractedloc[y], f"{filename}/{episodes[y][0]}.{encode}")
     window.destroy()
 
+
+# app's asks the users with example videos
 def testconvert():
     convertbrain()
-    for y in range(len(nepisodes)):
-        newname = f"{filename}/{nepisodes[y][0]} - {extractedfiles[y][1:]}.{encode}"
+    for y in range(len(episodes)):
+        newname = f"{filename}/{episodes[y][0]} - {extractedfiles[y][1:]}.{encode}"
         testrunoutput.append(newname)
         os.rename(extractedloc[y], newname)
     main.grid_forget()
     testco.grid_forget()
+
+    # apps creates a button to apply changings
     testaccepter = ttk.Button(window, text="Accept Test Run", command=accepttestrun)
     testaccepter.config(width=15)
     testaccepter.grid(column=0, row=2, columnspan=2)
 
-def mainconvert():
-    convertbrain()
-    for y in range(len(nepisodes)):
-        os.rename(extractedloc[y], f"{filename}/{nepisodes[y][0]}.{encode}")
+
+# applies test run
+def accepttestrun():
+    for y in range(len(testrunoutput)):
+        os.rename(testrunoutput[y], f"{filename}/{episodes[y][0]}.{encode}")
     window.destroy()
 
+
+# creating tkinter interface
 is_true = True
 if is_true:
+
     window = tkinter.Tk()
     window.title("Episode Lister")
     window.config(padx=50, pady=50, bg=bg)
+
+    # create responsiveness
     n_rows = 2
     n_columns = 2
     for i in range(n_rows):
@@ -112,4 +132,3 @@ if is_true:
     testco.grid(column=1, row=1)
 
     window.mainloop()
-
