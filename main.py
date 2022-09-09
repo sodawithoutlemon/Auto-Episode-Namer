@@ -7,6 +7,12 @@ bg = "white"
 text = "black"
 
 exceptions = ["1080", "720"]
+
+years = 1990
+for x in range(50):
+    exceptions.append(str(years))
+    years +=1
+
 filename = None
 encode = ""
 extractedloc = []
