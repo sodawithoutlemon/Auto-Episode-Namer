@@ -131,4 +131,8 @@ if is_true:
     testco.config(width=15)
     testco.grid(column=1, row=1)
 
+    testco = ttk.Button(window, text="Test Run", command=testconvert)
+    testco.config(width=15)
+    testco.grid(column=1, row=1)
+
     window.mainloop()
